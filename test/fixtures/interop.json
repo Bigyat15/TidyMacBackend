@@ -1,0 +1,43 @@
+{
+  "public_key": "GX9rI+FshTLGq8g4+s1ep4m+DHaykgM0A5v6iz02jWE=",
+  "trial": {
+    "token": "TM1.eyJ2IjoxLCJwcm9kdWN0IjoidGlkeW1hYyIsIm1vZGUiOiJsaXZlIiwiZW50X2lkIjoiZW50X2ludGVyb3AiLCJjdXN0b21lciI6ImN1c19pbnRlcm9wIiwiaW5zdGFsbGF0aW9uIjoiaW5zdGFsbC1pbnRlcm9wLTAwMDEiLCJhY3RpdmF0aW9uIjoiYWN0X2ludGVyb3AiLCJpc3N1ZWRfYXQiOjE4MDAwMDAwMDAsInVwZGF0ZXNfdGhyb3VnaF9tYWpvciI6MSwia2lkIjoiazEiLCJraW5kIjoidHJpYWwiLCJzdGFydGVkX2F0IjoxODAwMDAwMDAwLCJleHBpcmVzX2F0IjoxODAwMDg2NDAwLCJsaWNlbnNlIjpudWxsLCJjaGVja19ieSI6MTgwMDA4NjQwMH0.rNUDKFdej7YuZdy6Y6Sgly4jJQtJDOiXV6skJAvkFstWqvAtOi8PfbQ9ZPhYoNg5tq83h95Wrhprz5bo4eKBCA",
+    "payload": {
+      "v": 1,
+      "product": "tidymac",
+      "mode": "live",
+      "ent_id": "ent_interop",
+      "customer": "cus_interop",
+      "installation": "install-interop-0001",
+      "activation": "act_interop",
+      "issued_at": 1800000000,
+      "updates_through_major": 1,
+      "kid": "k1",
+      "kind": "trial",
+      "started_at": 1800000000,
+      "expires_at": 1800086400,
+      "license": null,
+      "check_by": 1800086400
+    }
+  },
+  "pro": {
+    "token": "TM1.eyJ2IjoxLCJwcm9kdWN0IjoidGlkeW1hYyIsIm1vZGUiOiJsaXZlIiwiZW50X2lkIjoiZW50X2ludGVyb3AiLCJjdXN0b21lciI6ImN1c19pbnRlcm9wIiwiaW5zdGFsbGF0aW9uIjoiaW5zdGFsbC1pbnRlcm9wLTAwMDEiLCJhY3RpdmF0aW9uIjoiYWN0X2ludGVyb3AiLCJpc3N1ZWRfYXQiOjE4MDAwMDAwMDAsInVwZGF0ZXNfdGhyb3VnaF9tYWpvciI6MSwia2lkIjoiazEiLCJraW5kIjoicHJvIiwic3RhcnRlZF9hdCI6bnVsbCwiZXhwaXJlc19hdCI6bnVsbCwibGljZW5zZSI6ImxpY19pbnRlcm9wIiwiY2hlY2tfYnkiOjE4MDI1OTIwMDB9.VWjDdWD4D7D72bmu2e2nTmx4Adu6GY9o5H55VBvhKW_OioLA2EKydcjlEglsSu-r1t8ZXEO5Cacl61BelJjFDA",
+    "payload": {
+      "v": 1,
+      "product": "tidymac",
+      "mode": "live",
+      "ent_id": "ent_interop",
+      "customer": "cus_interop",
+      "installation": "install-interop-0001",
+      "activation": "act_interop",
+      "issued_at": 1800000000,
+      "updates_through_major": 1,
+      "kid": "k1",
+      "kind": "pro",
+      "started_at": null,
+      "expires_at": null,
+      "license": "lic_interop",
+      "check_by": 1802592000
+    }
+  }
+}

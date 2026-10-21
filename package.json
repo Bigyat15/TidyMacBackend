@@ -1,0 +1,23 @@
+{
+  "name": "tidymac-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TidyMac licensing, payments and sign-in API",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node src/index.ts",
+    "dev:setup": "node scripts/dev-setup.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prune": "node scripts/prune.ts",
+    "keys": "node scripts/gen-prod-keys.ts",
+    "admin": "node scripts/admin.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

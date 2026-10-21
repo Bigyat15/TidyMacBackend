@@ -1,0 +1,11 @@
+# Daily data-retention job (matches the privacy policy).
+[Unit]
+Description=TidyMac data retention prune
+
+[Service]
+Type=oneshot
+User=tidymac
+Group=tidymac
+WorkingDirectory=/opt/tidymac-backend
+EnvironmentFile=/etc/tidymac/backend.env
+ExecStart=/usr/bin/node scripts/prune.ts

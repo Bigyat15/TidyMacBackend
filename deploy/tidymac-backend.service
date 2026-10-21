@@ -1,0 +1,24 @@
+# Template. Adjust User and paths to your server. Secrets live in /etc/tidymac/backend.env, never in this file.
+[Unit]
+Description=TidyMac licensing API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=tidymac
+Group=tidymac
+WorkingDirectory=/opt/tidymac-backend
+EnvironmentFile=/etc/tidymac/backend.env
+ExecStart=/usr/bin/node src/index.ts
+Restart=on-failure
+RestartSec=3
+# creates /var/lib/tidymac owned by the service user; the database lives there and survives deploys
+StateDirectory=tidymac
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/tidymac
+
+[Install]
+WantedBy=multi-user.target

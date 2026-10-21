@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ES2023", "module": "ESNext", "moduleResolution": "bundler", "allowImportingTsExtensions": true,
+    "noEmit": true, "strict": true, "skipLibCheck": true, "types": ["node"], "lib": ["ES2023"],
+    "verbatimModuleSyntax": false, "erasableSyntaxOnly": true
+  },
+  "include": ["src", "scripts", "test"]
+}
