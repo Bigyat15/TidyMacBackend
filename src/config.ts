@@ -26,10 +26,11 @@ export interface Config {
   };
   rate: { codePerEmailHour: number; codePerIpHour: number; codePerInstallationHour: number; verifyPerIpHour: number; keyAttemptsPerIpHour: number };
   provider: {
-    name: "mock" | "paddle";
+    name: "mock" | "paddle" | "dodo";
     mode: "mock" | "sandbox" | "live";
     mockWebhookSecret: string;
     paddle: { apiKey: string; webhookSecret: string; priceId: string };
+    dodo: { apiKey: string; webhookSecret: string; productId: string; returnUrl: string };
   };
   mail: { provider: "console" | "resend"; from: string; resendApiKey: string };
   identity: { name: "google" | "mock"; googleClientId: string; googleClientSecret: string };
@@ -61,8 +62,12 @@ export function loadConfig(e: E = process.env): Config {
     return e[k] ?? "";
   };
 
-  const providerName = (e.PAYMENT_PROVIDER ?? (strict ? "" : "mock")) as "mock" | "paddle";
-  if (!["mock", "paddle"].includes(providerName)) problems.push("PAYMENT_PROVIDER must be mock or paddle");
+  const providerName = (e.PAYMENT_PROVIDER ?? (strict ? "" : "mock")) as "mock" | "paddle" | "dodo";
+  if (!["mock", "paddle", "dodo"].includes(providerName)) problems.push("PAYMENT_PROVIDER must be mock, paddle or dodo");
+  const dodoEnv = e.DODO_PAYMENTS_ENVIRONMENT ?? "test_mode";
+  if (providerName === "dodo" && !["test_mode", "live_mode"].includes(dodoEnv)) problems.push("DODO_PAYMENTS_ENVIRONMENT must be test_mode or live_mode");
+  if (env === "production" && providerName === "dodo" && dodoEnv !== "live_mode") problems.push("production requires DODO_PAYMENTS_ENVIRONMENT=live_mode");
+  if (env === "staging" && providerName === "dodo" && dodoEnv === "live_mode") problems.push("staging must use DODO_PAYMENTS_ENVIRONMENT=test_mode");
   const paddleMode = (e.PADDLE_MODE ?? "sandbox") as "sandbox" | "live";
   if (providerName === "paddle" && !["sandbox", "live"].includes(paddleMode)) problems.push("PADDLE_MODE must be sandbox or live");
   if (providerName === "mock" && strict) problems.push("PAYMENT_PROVIDER=mock is not allowed in staging or production");
@@ -105,6 +110,15 @@ export function loadConfig(e: E = process.env): Config {
     paddle.webhookSecret = need("PADDLE_WEBHOOK_SECRET");
     paddle.priceId = need("PADDLE_PRICE_ID");
   }
+  const dodo = { apiKey: "", webhookSecret: "", productId: "", returnUrl: "" };
+  if (providerName === "dodo") {
+    dodo.apiKey = need("DODO_PAYMENTS_API_KEY");
+    dodo.webhookSecret = need("DODO_PAYMENTS_WEBHOOK_SECRET");
+    dodo.productId = need("DODO_PAYMENTS_PRODUCT_ID", "the one-time TidyMac Pro product");
+    dodo.returnUrl = e.DODO_PAYMENTS_RETURN_URL || `${websiteUrl}/purchase-success/`;
+    if (strict && !dodo.returnUrl.startsWith("https://")) problems.push("DODO_PAYMENTS_RETURN_URL must be https:// in staging/production");
+  }
+  const providerMode: "mock" | "sandbox" | "live" = providerName === "mock" ? "mock" : providerName === "dodo" ? (dodoEnv === "live_mode" ? "live" : "sandbox") : paddleMode;
   const mockSecret = e.MOCK_WEBHOOK_SECRET ?? "dev-only-mock-webhook-secret";
 
   const from = e.EMAIL_FROM ?? "";
@@ -133,7 +147,7 @@ export function loadConfig(e: E = process.env): Config {
     dbPath,
     trustProxy: e.TRUST_PROXY === "1",
     signing: { privateKeyB64: signingKey, kid: e.LICENSE_SIGNING_KID ?? "k1" },
-    entitlementMode: providerName === "paddle" && paddleMode === "live" ? "live" : "test",
+    entitlementMode: providerName !== "mock" && providerMode === "live" ? "live" : "test",
     secrets: { codes: secretCodes, licenseKeys: secretKeys },
     policy: {
       trialHours: int(e, "TRIAL_HOURS", 24),
@@ -151,7 +165,7 @@ export function loadConfig(e: E = process.env): Config {
       verifyPerIpHour: int(e, "RATE_VERIFY_PER_IP_HOUR", 40),
       keyAttemptsPerIpHour: int(e, "RATE_KEY_ATTEMPTS_PER_IP_HOUR", 10),
     },
-    provider: { name: providerName, mode: providerName === "mock" ? "mock" : paddleMode, mockWebhookSecret: mockSecret, paddle },
+    provider: { name: providerName, mode: providerMode, mockWebhookSecret: mockSecret, paddle, dodo },
     mail: { provider: mailProvider, from, resendApiKey },
     identity: { name: identityName, googleClientId: e.GOOGLE_CLIENT_ID ?? "", googleClientSecret: e.GOOGLE_CLIENT_SECRET ?? "" },
     signinTtlSec: int(e, "SIGNIN_TTL_SECONDS", 600),

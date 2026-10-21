@@ -7,6 +7,7 @@ import { MockProvider } from "./providers/mock.ts";
 import { GoogleIdentity } from "./identity/google.ts";
 import { MockIdentity } from "./identity/mock.ts";
 import { PaddleProvider } from "./providers/paddle.ts";
+import { DodoProvider } from "./providers/dodo.ts";
 import { createAppServer } from "./app.ts";
 import type { Ctx } from "./service.ts";
 
@@ -23,11 +24,13 @@ export function buildContext(env: NodeJS.ProcessEnv = process.env): Ctx {
   const cfg = loadConfig(env); // throws with every problem listed; production never starts half-configured
   const db = openDb(cfg.dbPath);
   const mail = cfg.mail.provider === "resend" ? new ResendMailer(cfg.mail.resendApiKey, cfg.mail.from) : new ConsoleMailer();
+  const tol = cfg.policy.webhookToleranceSec;
+  const mode = cfg.provider.mode as "sandbox" | "live";
   const provider =
-    cfg.provider.name === "paddle"
-      ? new PaddleProvider({ ...cfg.provider.paddle, mode: cfg.provider.mode as "sandbox" | "live", toleranceSec: cfg.policy.webhookToleranceSec })
-      : new MockProvider(cfg.apiUrl, cfg.provider.mockWebhookSecret, cfg.policy.webhookToleranceSec);
-  const priceId = cfg.provider.name === "paddle" ? cfg.provider.paddle.priceId : "pri_mock_tidymac_pro";
+    cfg.provider.name === "paddle" ? new PaddleProvider({ ...cfg.provider.paddle, mode, toleranceSec: tol })
+    : cfg.provider.name === "dodo" ? new DodoProvider({ ...cfg.provider.dodo, mode, toleranceSec: tol })
+    : new MockProvider(cfg.apiUrl, cfg.provider.mockWebhookSecret, tol);
+  const priceId = cfg.provider.name === "paddle" ? cfg.provider.paddle.priceId : cfg.provider.name === "dodo" ? cfg.provider.dodo.productId : "pri_mock_tidymac_pro";
   const identity = cfg.identity.name === "google" ? new GoogleIdentity({ clientId: cfg.identity.googleClientId, clientSecret: cfg.identity.googleClientSecret }) : new MockIdentity(cfg.apiUrl);
   return { cfg, db, mail, provider, identity, priceId, now: () => Math.floor(Date.now() / 1000) };
 }

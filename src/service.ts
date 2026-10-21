@@ -318,7 +318,7 @@ export async function createCheckout(ctx: Ctx, i: { email?: unknown; ip: string 
   const email = i.email ? normalizeEmail(i.email) : undefined;
   const id = randomId("chk");
   run(ctx.db, "INSERT INTO checkouts(id, provider, email, created_at, updated_at) VALUES (?, ?, ?, ?, ?)", id, ctx.provider.name, email ?? null, ctx.now(), ctx.now());
-  const r = await ctx.provider.createCheckout({ checkoutId: id, email });
+  const r = await ctx.provider.createCheckout({ checkoutId: id, email, returnUrl: `${ctx.cfg.websiteUrl}/purchase-success/?checkout_id=${id}` });
   run(ctx.db, "UPDATE checkouts SET provider_ref = ? WHERE id = ?", r.providerRef ?? null, id);
   audit(ctx, "checkout_created", null, { checkout: id, provider: ctx.provider.name });
   return { url: r.url, checkout_id: id, test_mode: ctx.provider.mode !== "live" };
@@ -335,7 +335,7 @@ export type WebhookResult = { status: "processed" | "duplicate" | "ignored" };
 
 export async function handleWebhook(ctx: Ctx, raw: string, headers: Record<string, string | undefined>): Promise<WebhookResult> {
   ctx.provider.verifyWebhook(raw, headers, ctx.now()); // throws 401: nothing below runs for an unauthenticated request
-  const ev = ctx.provider.parseEvent(raw);
+  const ev = ctx.provider.parseEvent(raw, headers);
   const existing = get(ctx.db, "SELECT id, state FROM webhook_events WHERE provider = ? AND event_id = ?", ctx.provider.name, ev.eventId);
   if (existing && (existing.state === "processed" || existing.state === "ignored")) return { status: "duplicate" };
   const rowId = existing?.id ?? randomId("whe");

@@ -25,13 +25,14 @@ export interface PurchaseFacts {
 }
 
 export interface PaymentProvider {
-  readonly name: "mock" | "paddle";
+  readonly name: "mock" | "paddle" | "dodo";
   readonly mode: "mock" | "sandbox" | "live";
   /** Hosted checkout for the configured one-time product. The price comes from provider configuration, never from the client. */
-  createCheckout(input: { checkoutId: string; email?: string }): Promise<{ url: string; providerRef?: string }>;
+  createCheckout(input: { checkoutId: string; email?: string; returnUrl?: string }): Promise<{ url: string; providerRef?: string }>;
   /** Throws ApiError(401) unless the signature is valid and fresh. Must be called with the exact raw request body. */
   verifyWebhook(raw: string, headers: Record<string, string | undefined>, nowSec: number): void;
-  parseEvent(raw: string): PaymentEvent;
+  /** `headers` carries provider event ids that are not in the body (Dodo's `webhook-id`). */
+  parseEvent(raw: string, headers?: Record<string, string | undefined>): PaymentEvent;
   /** Independently re-checks a purchase with the provider's API. `null` when the adapter cannot (mock). */
   verifyPurchase(orderId: string): Promise<PurchaseFacts | null>;
   getPurchaseStatus(orderId: string): Promise<{ status: string }>;

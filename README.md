@@ -1,6 +1,6 @@
 # TidyMac backend
 
-Licensing, payments (Paddle), email codes (Resend) and Sign in with Google for the TidyMac desktop app and website.
+Licensing, payments (Dodo Payments; Paddle also supported), email codes (Resend) and Sign in with Google for the TidyMac desktop app and website.
 Plain Node.js (24+) with no runtime npm dependencies: it uses `node:sqlite`, `node:http` and `node:crypto`.
 `npm install` only brings in test/type tooling.
 
@@ -35,7 +35,7 @@ Binds to `HOST` (default `127.0.0.1`) and `PORT` (default 8787). Put a TLS rever
 `npm ci && npm run typecheck && npm test` (61 tests; they use in-memory databases and local ports, never real providers).
 
 ## API (unchanged contract)
-`GET /health` · `POST /v1/auth/request-code`, `/v1/auth/verify`, `/v1/auth/oauth/start`, `/v1/auth/oauth/poll` ·
+`GET /health` · payment webhook `POST /v1/webhooks/dodo` (Dodo) · `POST /v1/auth/request-code`, `/v1/auth/verify`, `/v1/auth/oauth/start`, `/v1/auth/oauth/poll` ·
 `GET /v1/auth/google/begin`, `/v1/auth/google/callback` · `POST /v1/license/activate`, `/v1/entitlement/refresh`,
 `/v1/devices/list|deactivate|release` · `POST /v1/checkout`, `GET /v1/checkout/status` · `POST /v1/recover/request|verify` ·
 payment webhook (signature verified). `/dev/*` pages exist only with the mock providers in development/test.
